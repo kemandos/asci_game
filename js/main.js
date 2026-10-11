@@ -33,7 +33,7 @@ function mainKeyDown(e) {
   const code = e.code;
   mainGesture();
   const gameKey = MAIN_MOVE.has(code) || code in MAIN_ACTIONS || code === 'Escape' || code === 'Tab' ||
-    code === 'KeyH' || code === 'KeyN' || code === 'Slash' || code === 'Backspace' || /^Digit\d$/.test(code);
+    code === 'KeyH' || code === 'KeyN' || code === 'KeyT' || code === 'Slash' || code === 'Backspace' || /^Digit\d$/.test(code);
   if (gameKey) e.preventDefault();
 
   if (typeof UI !== 'undefined' && UI.isOpen()) {
@@ -56,6 +56,7 @@ function mainKeyDown(e) {
   }
   if (e.repeat) return;
   if (code === 'Escape') { openPause(); return; }
+  if (code === 'KeyT') { if (typeof isoToggleView === 'function') isoToggleView(); return; }
   if (code === 'KeyH' || e.key === '?') { openHelp(null); return; }
   const act = MAIN_ACTIONS[code];
   if (act) {

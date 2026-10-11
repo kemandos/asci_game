@@ -152,6 +152,7 @@ function rndFlush(r0, r1, dx, dy) {
 
 // map cell -> device pixel centre
 function rndCellPx(mx, my) {
+  if (typeof isoActive === 'function' && isoActive()) return isoCellPx(mx, my);
   const sx = mx - RND.camX, sy = my - RND.camY + VIEW_Y;
   const cw = RND.cw * RND.s, ch = RND.ch * RND.s;
   return [(sx + 0.5) * cw, (sy + 0.5) * ch];
@@ -185,7 +186,8 @@ function renderFrame(now) {
     return;
   }
   const m = g.map;
-  rndMap(now, g, m);
+  const iso = typeof isoActive === 'function' && isoActive(g);   // js/iso.js
+  if (iso) drawIsoView(now, g, m); else rndMap(now, g, m);
   rndHud(now, g);
   rndBottom(now, g, m);
 
@@ -206,7 +208,7 @@ function renderFrame(now) {
   const vx0 = 0, vy0 = RND.rowY[VIEW_Y], vx1 = RND.colX[VIEW_W], vy1 = RND.rowY[VIEW_Y + VIEW_H];
   ctx.save();
   ctx.beginPath(); ctx.rect(vx0, vy0, vx1 - vx0, vy1 - vy0); ctx.clip();
-  rndFlush(VIEW_Y, VIEW_Y + VIEW_H, sx, sy);
+  if (iso) isoFlushView(now, sx, sy); else rndFlush(VIEW_Y, VIEW_Y + VIEW_H, sx, sy);
   ctx.translate(sx, sy);
   if (RND.moon) rndFieldMoon(now, m);
   rndPreview(now);
