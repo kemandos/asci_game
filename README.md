@@ -28,6 +28,7 @@ Progress is saved to `localStorage` whenever you rest at a lamp.
 | Music Box | M | Back / Select |
 | Pause menu | Esc | Start / Options |
 | Help · Toggle sound | H · N | — |
+| Isometric / top-down view | T | — |
 
 Menus: ↑/↓ (or stick/D-pad) to choose, Enter/Space/E (or A/Cross) to select, Esc (or B/Circle) to go back. Mouse works too.
 
@@ -47,7 +48,7 @@ Menus: ↑/↓ (or stick/D-pad) to choose, Enter/Space/E (or A/Cross) to select,
 
 ## Files
 
-`js/util.js` helpers · `js/data.js` content · `js/map.js` level generation, lighting & FOV · `js/audio.js` synthesized sound · `js/game.js` game logic · `js/render.js` canvas renderer · `js/ui.js` menus · `js/input.js` gamepad · `js/main.js` loop & keyboard.
+`js/util.js` helpers · `js/data.js` content · `js/map.js` level generation, lighting & FOV · `js/audio.js` synthesized sound · `js/game.js` game logic · `js/render.js` canvas renderer · `js/iso.js` isometric view · `js/ui.js` menus · `js/input.js` gamepad · `js/main.js` loop & keyboard.
 
 ## Disclaimer
 

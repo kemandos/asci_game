@@ -340,6 +340,7 @@ const UI_HELP_HTML = `
 <tr><td>Blood Bullets</td><td>B</td></tr>
 <tr><td>Music Box</td><td>M</td></tr>
 <tr><td>Pause · Help · Sound</td><td>Esc · H · N</td></tr>
+<tr><td>Isometric / top-down view</td><td>T</td></tr>
 </table>
 <table class="keys">
 <tr><th colspan="3">Controller</th></tr>
