@@ -358,7 +358,7 @@ const UI_HELP_HTML = `
 </div>
 <ul class="tips">
 <li><b class="r">Red tiles</b> are a foe's blow about to land. Step out of them - or quickstep through, untouchable for an instant.</li>
-<li>Fire your gun the moment a foe winds up: it <b class="y">staggers</b> (pulsing yellow). Strike it then for a <b class="r">visceral attack</b>.</li>
+<li>Fire your gun while a winding-up foe <b class="r">flashes white-hot</b>: it <b class="y">staggers</b> (pulsing yellow). Strike it then for a <b class="r">visceral attack</b>.</li>
 <li>When hurt, part of your health turns <b class="o">orange</b>. Strike back quickly to regain it - this is the <i>rally</i>.</li>
 <li>The faint shade before you shows your weapon's reach. Transform it for a different shape.</li>
 <li>Death drops your Blood Echoes as a bloodstain <b class="r">§</b>. Reach it to reclaim them - die first, and they are lost.</li>

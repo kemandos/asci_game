@@ -236,6 +236,9 @@ function renderFrame(now) {
   rndBanner(now, g);
 }
 
+function rndParryable(e) {
+  try { return typeof parryWindow === 'function' && parryWindow(e); } catch (err) { return false; }
+}
 function rndMaxHp() {
   try { return typeof maxHp === 'function' ? maxHp() : 100; } catch (e) { return 100; }
 }
@@ -413,7 +416,7 @@ function rndMap(now, g, m) {
       } else {
         // remembered: very dim blue-grey, no lamps, no blood glow
         const mc = mix(col, RND_MEM, 0.62);
-        fg = rndRGB(mc, t === tT.WALL ? 0.34 : 0.26);
+        fg = rndRGB(mc, t === tT.WALL ? 0.46 : 0.36);
         bg = undefined;
         if (t === tT.FOG) fg = rndRGB([150, 150, 170], 0.35);
       }
@@ -566,7 +569,7 @@ function rndOverlays(now, g, m) {
     const wu = e.atk.windup || 10;
     const pr = clamp(1 - (e.timer || 0) / wu, 0, 1);
     let I = 0.28 + 0.72 * pr;
-    if (pr > 0.72) I *= 0.85 + 0.15 * Math.sin(now * 0.06);
+    if (rndParryable(e)) I *= 0.85 + 0.15 * Math.sin(now * 0.06);
     const special = e.atk.special === 'bloodletting';
     const bg = special
       ? rndRGB([120 + 100 * I, 8, 60 + 40 * I], 0.55 + 0.45 * I)
@@ -593,8 +596,12 @@ function rndOverlays(now, g, m) {
       bgCol = rndRGB([90, 70, 0], 0.4 + 0.6 * pk);
     } else if (e.state === 'windup' && e.atk) {
       const pr = clamp(1 - (e.timer || 0) / (e.atk.windup || 10), 0, 1);
-      const pk = 0.5 + 0.5 * Math.sin(now * 0.03);
-      col = mix(base, [255, 70, 56], 0.3 + 0.5 * pr * pk + 0.2 * pr);
+      if (rndParryable(e)) {
+        // exactly the gun-parry window: hard white-hot flash ("shoot now")
+        const pk = 0.5 + 0.5 * Math.sin(now * 0.05);
+        col = mix([255, 70, 56], [255, 244, 210], 0.35 + 0.65 * pk);
+        bgCol = rndRGB([150, 24, 16], 0.6 + 0.4 * pk);
+      } else col = mix(base, [255, 70, 56], 0.15 + 0.35 * pr);
     } else if (e.state === 'dormant') col = mix(base, [90, 90, 110], 0.25);
     else if (e.state === 'transform') col = mix(base, [255, 255, 255], 0.5 + 0.5 * Math.sin(now * 0.04));
     const art = size > 1 ? (e.art || (e.d && e.d.art)) : null;
@@ -794,33 +801,37 @@ function rndHud(now, g) {
   x += 3;
   const exhausted = stv < 15;
   RND.bars.push({ x, y: 0, w: sw, back: [16, 34, 22], segs: [[0, clamp(stv / ms, 0, 1), exhausted ? [70, 110, 70] : [70, 168, 92], 1]] });
-  // row 1
-  x = 1;
-  x = rndText(x, 1, '!', '#e3303e');
-  x = rndText(x + 1, 1, String(sv.vials ?? 0), (sv.vials || 0) ? '#e8d6c0' : '#6a5050');
-  x = rndText(x + 3, 1, ':', '#ccd4e0');
-  x = rndText(x + 1, 1, String(sv.bullets ?? 0), (sv.bullets || 0) ? '#e8d6c0' : '#6a5050');
-  x = rndText(x + 3, 1, '◊', '#b8b8ff');
-  x = rndText(x + 1, 1, String(sv.shards ?? 0), '#c8c4e8');
-  if (sv.cords) { x = rndText(x + 3, 1, '∞', '#d862a8'); x = rndText(x + 1, 1, String(sv.cords), '#e0b0cc'); }
-  x = rndText(x + 3, 1, 'Echoes', '#9a8a60');
-  x = rndText(x + 1, 1, String(Math.floor(sv.echoes || 0)), '#f0d898');
-  x = rndText(x + 3, 1, 'Insight', '#7c8aa8');
-  x = rndText(x + 1, 1, String(sv.insight || 0), '#b8c8f0');
+  // row 1: counters on the left, weapon right-aligned; tighten the spacing (then
+  // drop the weapon's name) when a late-game hunter's numbers would overflow the row.
   let lv = 0;
   try { lv = typeof level === 'function' ? level() : 0; } catch (e) { lv = 0; }
-  x = rndText(x + 3, 1, 'Lv', '#9c8a78');
-  x = rndText(x + 1, 1, String(lv), '#e8d6c0');
-  // weapon (right aligned)
+  const items = [
+    [['!', '#e3303e'], [String(sv.vials ?? 0), (sv.vials || 0) ? '#e8d6c0' : '#6a5050']],
+    [[':', '#ccd4e0'], [String(sv.bullets ?? 0), (sv.bullets || 0) ? '#e8d6c0' : '#6a5050']],
+    [['◊', '#b8b8ff'], [String(sv.shards ?? 0), '#c8c4e8']],
+  ];
+  if (sv.cords) items.push([['∞', '#d862a8'], [String(sv.cords), '#e0b0cc']]);
+  items.push([['Echoes', '#9a8a60'], [String(Math.floor(sv.echoes || 0)), '#f0d898']]);
+  items.push([['Insight', '#7c8aa8'], [String(sv.insight || 0), '#b8c8f0']]);
+  items.push([['Lv', '#9c8a78'], [String(lv), '#e8d6c0']]);
   const wd = (typeof WEAPONS !== 'undefined' && WEAPONS[sv.weapon]) || null;
+  const up = wd && sv.upgrade ? ` +${sv.upgrade}` : '';
+  const form = wd && wd.forms[p.form || 0] ? wd.forms[p.form || 0].name : '';
+  let wn = wd ? wd.name + up : '', fm = wd ? ` [${form}]` : '';
+  const leftW = gap => 1 + items.reduce((n, it) => n + it[0][0].length + 1 + it[1][0].length, 0) + gap * (items.length - 1);
+  let gap = 3;
+  if (leftW(gap) + 2 + wn.length + fm.length > COLS - 1) gap = 2;
+  if (wd && leftW(gap) + 2 + wn.length + fm.length > COLS - 1) wn = up.trim();
+  x = 1;
+  items.forEach((it, n) => {
+    x = rndText(x + (n ? gap : 0), 1, it[0][0], it[0][1]);
+    x = rndText(x + 1, 1, it[1][0], it[1][1]);
+  });
   if (wd) {
-    const up = sv.upgrade ? ` +${sv.upgrade}` : '';
-    const form = wd.forms[p.form || 0] ? wd.forms[p.form || 0].name : '';
-    const wn = wd.name + up, fm = ` [${form}]`;
     const total = wn.length + fm.length;
     let wx = Math.max(x + 2, COLS - 1 - total);
     wx = rndText(wx, 1, wn, '#d8c8a8');
-    rndText(wx, 1, fm, p.form ? '#e0a050' : '#8a7a68');
+    rndText(wx, 1, wn ? fm : fm.trim(), p.form ? '#e0a050' : '#8a7a68');
   }
 }
 

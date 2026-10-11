@@ -432,6 +432,7 @@ function buildDream() {
     m.lights.push({ x, y, r: 4, k: 0.7 });
   }
   m.rooms = [{ x: 1, y: 1, w: W - 2, h: H - 2, kind: 'main', index: 0 }];
+  m.seen.fill(1);   // the Dream is home: the whole garden is always remembered
   return m;
 }
 
@@ -485,7 +486,8 @@ function computeLight(m) {
 // --- field of view (raycasting) ----------------------------------------------------
 // The player always stands on an integer cell and rays start at its centre, so the
 // sequence of cells each ray crosses is fixed: precompute it once as offsets.
-const FOV_RADIUS = 18, FOV_RAYS = 720;
+const FOV_RADIUS = 26, FOV_RAYS = 900;
+const FOV_AMB_R2 = 18 * 18;   // ambient light only reaches this far; lamps/pyres are seen to FOV_RADIUS
 const FOV_PATHS = (() => {
   const paths = [];
   for (let a = 0; a < FOV_RAYS; a++) {
@@ -507,13 +509,16 @@ function computeFOV(m, px, py) {
   const { w, h, tiles, vis, seen, light } = m;
   vis.fill(0);
   const def = m.def || {};
-  const amb = def.ambient || 0, lr = (def.light || 7) + 1;
+  // sight radius ~11 tiles across (~8 rows up/down: cells are tall) for light 7.5;
+  // brightness falls from ~1 at the hunter to 0.16 at the rim, so the edge stays readable.
+  const amb = def.ambient || 0, sr = (def.light || 7) * 1.5, ambFar = amb >= 0.5;  // hubs: daylight-bright
   const visList = [];
   const mark = (x, y) => {
     const i = y * w + x;
     if (vis[i] > 0) return;
-    const dx = x - px, dy = (y - py) * 1.4;
-    const b = Math.max(amb, 1 - Math.sqrt(dx * dx + dy * dy) / lr, light[i]);
+    const dx = x - px, dy = (y - py) * 1.4, dl = Math.sqrt(dx * dx + dy * dy);
+    const f = 1 - dl / sr;
+    const b = Math.max(ambFar || dx * dx + (y - py) * (y - py) <= FOV_AMB_R2 ? amb : 0, f > 0 ? 0.16 + 0.9 * f : 0, light[i]);
     if (b >= 0.12) { vis[i] = Math.min(1.2, b); seen[i] = 1; visList.push(i); }
   };
   if (inb(m, px, py)) mark(px, py);

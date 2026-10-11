@@ -201,7 +201,7 @@ function newGame(weaponId) {
   beginRun(true);
   banner('Central Yharnam', '#d8cfb8', 3200, 0.75, 'The night of the hunt');
   log('You wake in Iosefka\'s clinic. Yharnam burns.', '#d8c8a8');
-  log('Move WASD/arrows · J light · K heavy · L gun · Space dodge · Q transform · R vial · E use · H help', '#9a9488');
+  log('WASD move · J/K attack · L gun · Space dodge · Q transform · R vial · H help', '#9a9488');
   saveGame();
 }
 
@@ -1469,7 +1469,7 @@ function damageEnemy(e, dmg, opts) {
   bleed(nx, ny, opts.visceral ? 6 : opts.heavy ? 8 : 5);
   // rally: strike back to regain lost health
   if (p.rally > 0 && !p.dead) {
-    const g = Math.min(p.rally, Math.floor(dmg * 0.5));
+    const g = Math.round(Math.min(p.rally, dmg * 0.5));
     if (g >= 1) {
       p.hp = Math.min(maxHp(), p.hp + g);
       p.rally = Math.max(0, p.rally - g);

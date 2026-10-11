@@ -34,7 +34,7 @@ Menus: ↑/↓ (or stick/D-pad) to choose, Enter/Space/E (or A/Cross) to select,
 ## The ways of the hunt
 
 - **Read the red.** Every enemy attack is telegraphed: the tiles it will strike glow red and grow brighter until the blow lands. Step out, or quickstep *through* it — dodging grants a moment of invulnerability.
-- **Parry with your gun.** Shoot a foe while it winds up an attack to stagger it (it pulses yellow). Then hit it with a light attack from an adjacent tile for a devastating **visceral attack**.
+- **Parry with your gun.** Shoot a foe late in its wind-up, while it flashes white-hot, to stagger it (it then pulses yellow). Then hit it with a light attack from an adjacent tile for a devastating **visceral attack**.
 - **Rally.** Damage you take leaves an orange segment on your health bar. Hit enemies quickly to win it back. Aggression is survival.
 - **Trick weapons** have two forms with different reach and shapes; the faint shade in front of you shows your current attack's reach.
 - **Blood Echoes** are both currency and experience. Die and you drop them as a bloodstain `§`; reach it to reclaim them. Die again first, and they are lost.
